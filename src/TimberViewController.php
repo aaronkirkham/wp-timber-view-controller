@@ -10,7 +10,7 @@ if ( ! class_exists( 'Timber' ) ) {
 class ViewController {
   private $_template_location = '';
 
-  function __construct( $template_location ) {
+  function __construct( $template_location = 'views' ) {
     $this->_template_location = untrailingslashit( $template_location );
 
     // register actions
