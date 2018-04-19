@@ -30,7 +30,7 @@ The tvc_%TEMPLATE%_context filter (where %TEMPLATE% is the current template name
 
 ```php
 add_filter( 'tvc_single_context', function( $ctx ) {
-  $ctx['post'] = new TimberPost();
+  $ctx['post'] = Timber::get_post();
   return $ctx;
 });
 ```
