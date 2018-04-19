@@ -3,7 +3,7 @@
 namespace Timber;
 
 // make sure timber is available
-if ( ! class_exists( 'Timber' ) ) {
+if ( ! class_exists( 'Timber\Timber' ) ) {
   exit;
 }
 
@@ -21,8 +21,13 @@ class ViewController {
    * Run controller and figure out which file to render
    */
   public function run() {
-    $templates = ( new Brain\Hierarchy\Hierarchy() )->getTemplates();
+    // if we are using woocommerce, and this is a woocommerce related page, skip it
+    if ( $this->is_using_woocommerce() && is_woocommerce() ) {
+      return;
+    }
 
+    $templates = ( new \Brain\Hierarchy\Hierarchy() )->getTemplates();
+    
     // get the global timber context
     $ctx = Timber::get_context();
 
@@ -43,5 +48,12 @@ class ViewController {
         exit();
       }
     }
+  }
+
+  /**
+   * Helper function to figure out if this site is running woocommerce
+   */
+  public function is_using_woocommerce() {
+    return in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) );
   }
 }
