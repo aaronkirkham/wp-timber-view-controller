@@ -2,7 +2,11 @@
 If you're like me and hate writing 2 files to render a twig template for WordPress (e.g. page.php and page.twig) then this library is for you. It follows the WordPress Template Hierarchy so you can also create files such as `single-{post_type}.twig`.
 
 ### How to use
-Using wp-timber-view-controller is easy. Place the following code inside your themes functions.php:
+Using wp-timber-view-controller is easy.
+
+`composer require aaronkirkham/wp-timber-view-controller`
+
+Then place the following code inside your themes functions.php:
 
 ```php
 require_once( __DIR__ . '/vendor/autoload.php' );
