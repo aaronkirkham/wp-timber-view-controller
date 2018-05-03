@@ -8,10 +8,10 @@ if ( ! class_exists( 'Timber\Timber' ) ) {
 }
 
 class ViewController {
-  private $_template_location = '';
+  private $view_location = '';
 
-  function __construct( $template_location = 'views' ) {
-    $this->_template_location = untrailingslashit( $template_location );
+  function __construct( $view_location = 'views' ) {
+    $this->view_location = strlen( $view_location ) > 0 ? trailingslashit( $view_location ) : $view_location;
 
     // register actions
     add_action( 'template_redirect', array( $this, 'run' ) );
@@ -21,17 +21,19 @@ class ViewController {
    * Run controller and figure out which file to render
    */
   public function run() {
+    // get the template hierarchy and the primary directory
     $templates = ( new \Brain\Hierarchy\Hierarchy() )->getTemplates();
+    $template_directory = trailingslashit( get_template_directory() );
     
-    // get the global timber context
-    $ctx = apply_filters( 'tvc_global_context', Timber::get_context() );
-
     // try load each template
     foreach ( $templates as $template ) {
-      $path = get_template_directory() . "/{$this->_template_location}/{$template}.twig";
+      $path = sprintf( '%s%s%s.twig', $template_directory, $this->view_location, $template );
 
       // does the current template file exists?
       if ( file_exists( $path ) ) {
+        // get the global timber context
+        $ctx = apply_filters( 'tvc_global_context', Timber::get_context() );
+
         // apply the per-template filter
         $ctx = apply_filters( "tvc_{$template}_context", $ctx );
 
@@ -39,6 +41,26 @@ class ViewController {
         Timber::render( $path, $ctx );
         exit();
       }
+    }
+
+    // no templates found. if we are in debug mode, show some info
+    if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
+      echo '<div style="border:5px solid red;padding:5px;">';
+
+      echo sprintf( '<h1>%s</h1>', __( 'WP Timber View Controller Error', 'wp-timber-view-controller' ) );
+      echo sprintf( '<p>%s</p>', __( 'We were unable to locate a suitable template to render. Below is a list of templates we tried to find (in hierarchical order).', 'wp-timber-view-controller' ) );
+
+      echo '<ul>';
+      foreach ( $templates as $template ) {
+        echo sprintf( '<li>%s.twig</li>', $template );
+      }
+      echo '</ul>';
+
+      echo sprintf( '<p><strong>%s</strong>: %s%s</p>', __( 'Template path', 'wp-timber-view-controller' ), $template_directory, $this->view_location );
+      
+      echo sprintf( '<pre><i>%s</i></pre>', __( 'You are viewing this error because you have WP_DEBUG enabled inside wp-config.php.', 'wp-timber-view-controller' ) );
+
+      echo '</div>';
     }
   }
 }
