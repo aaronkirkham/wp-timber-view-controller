@@ -12,10 +12,17 @@ Then place the following code inside your themes functions.php:
 require_once( __DIR__ . '/vendor/autoload.php' );
 
 new Timber\Timber;
-new Timber\ViewController( 'views' ); // where "views" is the directory inside your theme to your twig files.
+new Timber\ViewController;
 ```
 
-and that's it. Your templates will be automatically rendered.
+and that's it. Your Twig templates will be automatically rendered.
+
+This library uses the internal `Timber::$dirname` variable to locate your templates (default folder is `views`). If you want your files to live in a different folder, you must overwrite this.
+
+```php
+// look inside /templates/ instead of /views/
+Timber::$dirname = 'templates';
+```
 
 If you need to add variables to the Timber context, there are handy filters available for that.
 
@@ -40,7 +47,6 @@ add_filter( 'tvc_single_context', function( $ctx ) {
 ```
 
 In this example, the **post** variable will be available on all pages which are rendered using the single(.twig) template.
-
 
 ### White screen?
 

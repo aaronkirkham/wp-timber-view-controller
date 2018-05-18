@@ -8,11 +8,7 @@ if ( ! class_exists( 'Timber\Timber' ) ) {
 }
 
 class ViewController {
-  private $view_location = '';
-
-  function __construct( $view_location = 'views' ) {
-    $this->view_location = strlen( $view_location ) > 0 ? trailingslashit( $view_location ) : $view_location;
-
+  function __construct() {
     // register actions
     add_action( 'template_redirect', array( $this, 'run' ) );
   }
@@ -23,11 +19,17 @@ class ViewController {
   public function run() {
     // get the template hierarchy and the primary directory
     $templates = ( new \Brain\Hierarchy\Hierarchy() )->getTemplates();
-    $template_directory = trailingslashit( get_template_directory() );
+    $template_directory = trailingslashit( get_template_directory() ) . Timber::$dirname;
     
+    // if the post/page requires a password, only use the password template
+    // so we don't leak any private pages.
+    if ( post_password_required() ) {
+      $templates = array( 'password' );
+    }
+
     // try load each template
     foreach ( $templates as $template ) {
-      $path = sprintf( '%s%s%s.twig', $template_directory, $this->view_location, $template );
+      $path = sprintf( '%s/%s.twig', $template_directory, $template );
 
       // does the current template file exists?
       if ( file_exists( $path ) ) {
@@ -56,7 +58,7 @@ class ViewController {
       }
       echo '</ul>';
 
-      echo sprintf( '<p><strong>%s</strong>: %s%s</p>', __( 'Template path', 'wp-timber-view-controller' ), $template_directory, $this->view_location );
+      echo sprintf( '<p><strong>%s</strong>: %s</p>', __( 'Template path', 'wp-timber-view-controller' ), $template_directory );
       
       echo sprintf( '<pre><i>%s</i></pre>', __( 'You are viewing this error because you have WP_DEBUG enabled inside wp-config.php.', 'wp-timber-view-controller' ) );
 
