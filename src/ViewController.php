@@ -33,14 +33,11 @@ class ViewController {
 
       // does the current template file exists?
       if ( file_exists( $path ) ) {
-        // get the global timber context
-        $ctx = apply_filters( 'tvc_global_context', Timber::get_context() );
-
-        // apply the per-template filter
-        $ctx = apply_filters( "tvc_{$template}_context", $ctx );
+        // apply the per-template context filter
+        $context = apply_filters( "timber_context--{$template}", Timber::get_context() );
 
         // apply filters and render the template
-        Timber::render( $path, $ctx );
+        Timber::render( $path, $context );
         exit();
       }
     }

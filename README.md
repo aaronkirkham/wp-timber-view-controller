@@ -26,27 +26,36 @@ Timber::$dirname = 'templates';
 
 If you need to add variables to the Timber context, there are handy filters available for that.
 
-### Filter: tvc_global_context
-The tvc_global_context filter is fired for all templates rendered through Timber. If you need to add global variables to all Twig templates, this is the place to do it.
+### Filter: timber_context--%TEMPLATE%
+The `timber_context--%TEMPLATE%` filter (where %TEMPLATE% is the current template name) is fired when the specific template is rendered. This is handy if you want to get posts from WordPress on specific pages.
 
 ```php
-add_filter( 'tvc_global_context', function( $ctx ) {
-  $ctx['my_variable'] = 'Hello world!';
+add_filter( 'timber_context--404', function( $ctx ) {
+  $ctx['message'] = '404 - Not Found';
   return $ctx;
 });
 ```
 
-### Filter: tvc_%TEMPLATE%_context
-The tvc_%TEMPLATE%_context filter (where %TEMPLATE% is the current template name) is only fired when the specific template is rendered. This is handy if you want to get posts from WordPress on specific pages.
-
 ```php
-add_filter( 'tvc_single_context', function( $ctx ) {
-  $ctx['post'] = Timber::get_post();
+add_filter( 'timber_context--single', function( $ctx ) {
+  $ctx['post'] = new \Timber\Post();
   return $ctx;
 });
 ```
 
-In this example, the **post** variable will be available on all pages which are rendered using the single(.twig) template.
+In the above examples, the **message** variable will be available on all pages which are rendered using the 404.twig template, and the **post** variable will be available on all single.twig templates.
+
+### FYI
+If you want to add data into the context for every template, you should use the `timber_context` filter which is fired by Timber.
+
+```php
+add_filter( 'timber_context', function( $ctx ) {
+  $ctx['foo'] = 'bar';
+  return $ctx;
+});
+```
+
+The variable **foo** is now available on all templates.
 
 ### White screen?
 
